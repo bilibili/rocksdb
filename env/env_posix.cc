@@ -209,23 +209,36 @@ class PosixClock : public SystemClock {
 
 class PosixEnv : public CompositeEnv {
  public:
+  PosixEnv();
   PosixEnv(const PosixEnv* default_env, const std::shared_ptr<FileSystem>& fs);
-  ~PosixEnv() override {
-    if (this == Env::Default()) {
-      for (const auto tid : threads_to_join_) {
-        pthread_join(tid, nullptr);
-      }
-      for (int pool_id = 0; pool_id < Env::Priority::TOTAL; ++pool_id) {
-        thread_pools_[pool_id].JoinAllThreads();
-      }
-      // Do not delete the thread_status_updater_ in order to avoid the
-      // free after use when Env::Default() is destructed while some other
-      // child threads are still trying to update thread status. All
-      // PosixEnv instances use the same thread_status_updater_, so never
-      // explicitly delete it.
+  // ~PosixEnv() override {
+  //   if (this == Env::Default()) {
+  //     for (const auto tid : threads_to_join_) {
+  //       pthread_join(tid, nullptr);
+  //     }
+  //     for (int pool_id = 0; pool_id < Env::Priority::TOTAL; ++pool_id) {
+  //       thread_pools_[pool_id].JoinAllThreads();
+  //     }
+  //     // Do not delete the thread_status_updater_ in order to avoid the
+  //     // free after use when Env::Default() is destructed while some other
+  //     // child threads are still trying to update thread status. All
+  //     // PosixEnv instances use the same thread_status_updater_, so never
+  //     // explicitly delete it.
+  //   }
+  // }
+   ~PosixEnv() override {
+    for (const auto tid : threads_to_join_) {
+      pthread_join(tid, nullptr);
     }
+    for (int pool_id = 0; pool_id < Env::Priority::TOTAL; ++pool_id) {
+      thread_pools_[pool_id].JoinAllThreads();
+    }
+    // Do not delete the thread_status_updater_ in order to avoid the
+    // free after use when Env::Default() is destructed while some other
+    // child threads are still trying to update thread status. All
+    // PosixEnv instances use the same thread_status_updater_, so never
+    // explicitly delete it.
   }
-
   void SetFD_CLOEXEC(int fd, const EnvOptions* options) {
     if ((options == nullptr || options->set_fd_cloexec) && fd > 0) {
       fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
@@ -383,7 +396,7 @@ class PosixEnv : public CompositeEnv {
  private:
   friend Env* Env::Default();
   // Constructs the default Env, a singleton
-  PosixEnv();
+  // PosixEnv();
 
   // The below 4 members are only used by the default PosixEnv instance.
   // Non-default instances simply maintain references to the backing
@@ -497,6 +510,16 @@ Env* Env::Default() {
   // ~PosixEnv must be called on exit
   static PosixEnv default_env;
   return &default_env;
+}
+
+// NewPosixEnv will return instance of new PosixEnv.
+// Users must ensure that all the env was destructed before programing exits.
+// Otherwise segment fault will be occur (for threads must be joined when exit).
+Env *Env::NewEnv() {
+  // ensure that all enviroments was init before this Env.
+  // use (void*) convert to avoid compile warnning
+  (void *)Env::Default();
+  return new PosixEnv();
 }
 
 std::unique_ptr<Env> NewCompositeEnv(const std::shared_ptr<FileSystem>& fs) {
