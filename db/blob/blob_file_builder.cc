@@ -67,6 +67,7 @@ BlobFileBuilder::BlobFileBuilder(
       blob_file_size_(mutable_cf_options->blob_file_size),
       blob_compression_type_(mutable_cf_options->blob_compression_type),
       prepopulate_blob_cache_(mutable_cf_options->prepopulate_blob_cache),
+      enable_blob_ttl_(mutable_cf_options->enable_blob_ttl),
       file_options_(file_options),
       db_id_(std::move(db_id)),
       db_session_id_(std::move(db_session_id)),
@@ -148,8 +149,14 @@ Status BlobFileBuilder::Add(const Slice& key, const Slice& value,
     }
   }
 
-  BlobIndex::EncodeBlob(blob_index, blob_file_number, blob_offset, blob.size(),
-                        blob_compression_type_);
+  if (enable_blob_ttl_) {
+    uint64_t ttl = ValueWithTTL::DecodeTTL(value);
+    BlobIndex::EncodeBlobTTL(blob_index, ttl, blob_file_number, blob_offset, blob.size(),
+                             blob_compression_type_);
+  } else {
+    BlobIndex::EncodeBlob(blob_index, blob_file_number, blob_offset, blob.size(),
+                          blob_compression_type_);
+  }
 
   return Status::OK();
 }

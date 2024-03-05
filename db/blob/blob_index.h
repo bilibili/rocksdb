@@ -184,4 +184,39 @@ class BlobIndex {
   CompressionType compression_ = kNoCompression;
 };
 
+//  ValueWithTTL:
+//      +-------------+-----------+---------------+
+//      |   TTLType   | TTLHeader |   value       |
+//      +-------------+-----------+---------------+
+//      |    2 * char | uint32_t  | variable size |
+//      +-------------+-----------+---------------+
+
+class ValueWithTTL {
+ public:
+  static uint32_t DecodeTTL(const Slice& value) {
+    // NO TTL
+    if (value.size() <= sizeof(TTLTypeHeader)) {
+      return 0;
+    }
+    const char* data = value.data();
+    char* buf = const_cast<char*>(value.data());
+    const TTLTypeHeader* type_header = reinterpret_cast<TTLTypeHeader*>(buf);
+    // data is broken
+    if (value.size() < (sizeof(TTLTypeHeader) + type_header->len)) {
+        return 0;
+    }
+    char* dptr = const_cast<char*>(value.data() + sizeof(TTLTypeHeader));
+    TTLHeader* header = reinterpret_cast<TTLHeader*>(dptr);
+    return header->ttl;
+  }
+ private:
+  struct TTLTypeHeader {
+    uint8_t type : 2;
+    uint16_t len : 14;
+  };
+  struct TTLHeader {
+    uint32_t ttl;
+  };
+};
+
 }  // namespace ROCKSDB_NAMESPACE

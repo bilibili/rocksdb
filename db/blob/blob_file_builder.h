@@ -91,6 +91,7 @@ class BlobFileBuilder {
   uint64_t blob_file_size_;
   CompressionType blob_compression_type_;
   PrepopulateBlobCache prepopulate_blob_cache_;
+  bool enable_blob_ttl_;
   const FileOptions* file_options_;
   const std::string db_id_;
   const std::string db_session_id_;

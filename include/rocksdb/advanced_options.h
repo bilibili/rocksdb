@@ -1072,6 +1072,9 @@ struct AdvancedColumnFamilyOptions {
   // Dynamically changeable through the SetOptions() API
   PrepopulateBlobCache prepopulate_blob_cache = PrepopulateBlobCache::kDisable;
 
+  // Enable/disable blob ttl
+  bool enable_blob_ttl = false;
+
   // Enable memtable per key-value checksum protection.
   //
   // Each entry in memtable will be suffixed by a per key-value checksum.
