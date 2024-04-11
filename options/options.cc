@@ -444,7 +444,7 @@ void ColumnFamilyOptions::Dump(Logger* log) const {
               ? "flush only"
               : "disabled");
     }
-    ROCKS_LOG_HEADER(log, "         Options.enable_blob_ttl: %s",
+    ROCKS_LOG_HEADER(log, "Options.enable_blob_ttl: %s",
                      enable_blob_ttl ? "true" : "false");
     ROCKS_LOG_HEADER(log, "Options.experimental_mempurge_threshold: %f",
                      experimental_mempurge_threshold);
