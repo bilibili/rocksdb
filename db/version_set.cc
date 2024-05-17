@@ -2153,9 +2153,11 @@ Status Version::GetBlob(const ReadOptions& read_options, const Slice& user_key,
                         PinnableSlice* value, uint64_t* bytes_read) const {
   assert(value);
 
+  /*
   if (blob_index.HasTTL() || blob_index.IsInlined()) {
     return Status::Corruption("Unexpected TTL/inlined blob index");
   }
+  */
 
   const uint64_t blob_file_number = blob_index.file_number();
 
@@ -2196,11 +2198,13 @@ void Version::MultiGetBlob(
         continue;
       }
 
+      /*
       if (blob_index.HasTTL() || blob_index.IsInlined()) {
         *key_context.s =
             Status::Corruption("Unexpected TTL/inlined blob index");
         continue;
       }
+      */
 
       key_context.value->Reset();
       blob_reqs_in_file.emplace_back(

@@ -155,6 +155,7 @@ struct MutableCFOptions {
         blob_compaction_readahead_size(options.blob_compaction_readahead_size),
         blob_file_starting_level(options.blob_file_starting_level),
         prepopulate_blob_cache(options.prepopulate_blob_cache),
+	enable_blob_ttl(options.enable_blob_ttl),
         max_sequential_skip_in_iterations(
             options.max_sequential_skip_in_iterations),
         check_flush_compaction_key_order(
@@ -214,6 +215,7 @@ struct MutableCFOptions {
         blob_compaction_readahead_size(0),
         blob_file_starting_level(0),
         prepopulate_blob_cache(PrepopulateBlobCache::kDisable),
+	enable_blob_ttl(false),
         max_sequential_skip_in_iterations(0),
         check_flush_compaction_key_order(true),
         paranoid_file_checks(false),
@@ -301,6 +303,7 @@ struct MutableCFOptions {
   uint64_t blob_compaction_readahead_size;
   int blob_file_starting_level;
   PrepopulateBlobCache prepopulate_blob_cache;
+  bool enable_blob_ttl;
 
   // Misc options
   uint64_t max_sequential_skip_in_iterations;

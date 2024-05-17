@@ -109,7 +109,8 @@ AdvancedColumnFamilyOptions::AdvancedColumnFamilyOptions(const Options& options)
       blob_compaction_readahead_size(options.blob_compaction_readahead_size),
       blob_file_starting_level(options.blob_file_starting_level),
       blob_cache(options.blob_cache),
-      prepopulate_blob_cache(options.prepopulate_blob_cache) {
+      prepopulate_blob_cache(options.prepopulate_blob_cache),
+      enable_blob_ttl(options.enable_blob_ttl) {
   assert(memtable_factory.get() != nullptr);
   if (max_bytes_for_level_multiplier_additional.size() <
       static_cast<unsigned int>(num_levels)) {
@@ -443,6 +444,8 @@ void ColumnFamilyOptions::Dump(Logger* log) const {
               ? "flush only"
               : "disabled");
     }
+    ROCKS_LOG_HEADER(log, "Options.enable_blob_ttl: %s",
+                     enable_blob_ttl ? "true" : "false");
     ROCKS_LOG_HEADER(log, "Options.experimental_mempurge_threshold: %f",
                      experimental_mempurge_threshold);
 }  // ColumnFamilyOptions::Dump

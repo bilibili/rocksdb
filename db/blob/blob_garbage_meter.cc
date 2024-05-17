@@ -85,9 +85,11 @@ Status BlobGarbageMeter::Parse(const Slice& key, const Slice& value,
     }
   }
 
+  /*
   if (blob_index.IsInlined() || blob_index.HasTTL()) {
     return Status::Corruption("Unexpected TTL/inlined blob index");
   }
+  */
 
   *blob_file_number = blob_index.file_number();
   *bytes =

@@ -263,6 +263,7 @@ void UpdateColumnFamilyOptions(const MutableCFOptions& moptions,
       moptions.blob_compaction_readahead_size;
   cf_opts->blob_file_starting_level = moptions.blob_file_starting_level;
   cf_opts->prepopulate_blob_cache = moptions.prepopulate_blob_cache;
+  cf_opts->enable_blob_ttl = moptions.enable_blob_ttl;
 
   // Misc options
   cf_opts->max_sequential_skip_in_iterations =
