@@ -215,14 +215,9 @@ bool CompactionIterator::InvokeFilterIfNeeded(bool* need_skip,
   CompactionFilter::ValueType value_type =
       ikey_.type == kTypeValue ? CompactionFilter::ValueType::kValue
                                : CompactionFilter::ValueType::kBlobIndex;
-  // Hack: pass internal key to BlobIndexCompactionFilter since it needs
-  // to get sequence number.
+  // Hack: we don't use BlobIndexCompactionFilter, so we pass the user key to filter
   assert(compaction_filter_);
-  Slice& filter_key =
-      (ikey_.type == kTypeValue ||
-       !compaction_filter_->IsStackedBlobDbInternalCompactionFilter())
-          ? ikey_.user_key
-          : key_;
+  Slice& filter_key = ikey_.user_key;
   {
     StopWatchNano timer(clock_, report_detailed_time_);
     if (kTypeBlobIndex == ikey_.type) {
