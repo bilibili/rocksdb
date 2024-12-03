@@ -735,7 +735,13 @@ bool LevelCompactionBuilder::PickFileToCompact() {
     for (const FileMetaData* level_file : level_files) {
       total_l0_size += level_file->fd.GetFileSize();
     }
-    if (total_l0_size <  mutable_cf_options_.target_file_size_base) {
+    bool enable_l0_inner_compaction = true;
+    if (level_files.size() >=
+          static_cast<size_t>(
+              mutable_cf_options_.level0_slowdown_writes_trigger - 2)) {
+        enable_l0_inner_compaction = false;
+    }
+    if (enable_l0_inner_compaction && (total_l0_size < mutable_cf_options_.target_file_size_base)) {
       return false;
     }
   }
