@@ -150,7 +150,8 @@ class DBIter final : public Iterator {
     return valid_;
   }
   Slice key() const override {
-    assert(valid_);
+    // return deleted key
+    // assert(valid_);
     if (timestamp_lb_) {
       return saved_key_.GetInternalKey();
     } else {
